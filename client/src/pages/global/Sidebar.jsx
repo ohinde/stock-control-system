@@ -6,7 +6,8 @@ import { Box, Typography, useTheme } from '@mui/material';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 
-// MUI Icon Imports
+// MUI Icon Import
+import KeyIcon from '@mui/icons-material/Key';
 import HistoryIcon from '@mui/icons-material/History';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -103,6 +104,13 @@ const Sidebar = () => {
               title="Stock Table"
               to="/stock/table"
               icon={<InventoryIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Stock Dongles"
+              to="/stock/dongles"
+              icon={<KeyIcon />}
               selected={selected}
               setSelected={setSelected}
             />

@@ -95,6 +95,39 @@ app.post('/stock/update/quantity', (req, res) => {
   });
 });
 
+// Post request for updating stock location
+app.post('/stock/update/location', (req, res) => {
+  const date = new Date();
+
+  let currentDay = String(date.getDate()).padStart(2, '0');
+  let currentMonth = String(date.getMonth() + 1).padStart(2, '0');
+  let currentYear = date.getFullYear();
+
+  let currentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+
+  const q =
+    'UPDATE stock_control_system.stock_table SET `location` = ?, `lastUpdated` = ?, `updatedBy` = ? WHERE `partNumber` = ?;';
+  const values = [req.body[0].location, currentDate, req.body[0].updatedBy, req.body[0].partNumber];
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('Stock Item Location Updated Successfully');
+  });
+});
+
+// Post request for updating additional notes per stock item
+app.post('/stock/update/notes', (req, res) => {
+  const q = 'UPDATE stock_control_system.stock_table SET `additionalNotes` = ? WHERE `partNumber` = ?;';
+  const values = [req.body[0].additionalNotes, req.body[0].partNumber];
+
+  console.log(values);
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('Additional Notes Updated Successfully');
+  });
+});
+
 // -------------------- Stock Table - Settings - Categories -------------------- \\
 
 // Stock settings get request for loading categories
@@ -216,6 +249,78 @@ app.post('/stock/history/add', (req, res) => {
   db.query(q, [values], (err, data) => {
     if (err) return res.json(err);
     return res.json('Stock Item Added Successfully');
+  });
+});
+
+// -------------------- AOI License Dongles -------------------- \\
+
+// Machine License Dongle get request for loading all license dongle information
+app.get('/machines/aoi/licenses', (req, res) => {
+  const q = 'SELECT * FROM stock_control_system.stock_dongles;';
+  db.query(q, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
+});
+
+// Post request for manually creating existing license dongles
+app.post('/machines/aoi/licenses/create', (req, res) => {
+  const q =
+    'INSERT INTO stock_control_system.stock_dongles (`serialNumber`,`licenseDescription`,`allocatedMachineSerialNumber`,`allocatedMachineType`,`allocatedCustomer`) VALUES (?)';
+  const values = [
+    req.body.serialNumber,
+    req.body.licenseDescription,
+    req.body.allocatedMachineSerialNumber,
+    req.body.allocatedMachineType,
+    req.body.allocatedCustomer,
+  ];
+
+  db.query(q, [values], (err, data) => {
+    if (err) return res.json(err);
+    return res.json('License Dongle Added Succesfully');
+  });
+});
+
+// Post request for allocating an existing license dongle
+app.post('/machines/aoi/licenses/allocate', (req, res) => {
+  const q =
+    'UPDATE stock_control_system.stock_dongles SET `allocatedMachineSerialNumber` = ?, `allocatedMachineType` = ?, `allocatedCustomer` = ? WHERE `serialNumber` = ?;';
+  const values = [
+    req.body.allocatedMachineSerialNumber,
+    req.body.allocatedMachineType,
+    req.body.allocatedCustomer,
+    req.body.serialNumber,
+  ];
+
+  console.log(values);
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('License Dongle' + req.body.serialNumber + 'Allocated Successfully');
+  });
+});
+
+// Post request for updating an existing license dongle
+app.post('/machines/aoi/licenses/upgrade', (req, res) => {
+  const q = 'UPDATE stock_control_system.stock_dongles SET `licenseDescription` = ? WHERE `serialNumber` = ?;';
+  const values = [req.body.licenseDescription, req.body.serialNumber];
+
+  console.log(values);
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('License Dongle' + req.body.serialNumber + 'Updated Successfully');
+  });
+});
+
+// -------------------- AOI License Dongles - Settings -------------------- \\
+
+// Stock settings get request for loading categories
+app.get('/machines/aoi/licenses/options', (req, res) => {
+  const q = 'SELECT * FROM stock_control_system.dongle_options;';
+  db.query(q, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
   });
 });
 
