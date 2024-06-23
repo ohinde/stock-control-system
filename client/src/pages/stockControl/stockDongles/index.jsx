@@ -65,7 +65,7 @@ const MachineLicenseDongles = () => {
         }}
       >
         <DataGrid rows={rowData} columns={columns} components={{ Toolbar: GridToolbar }} />
-        <div style={{ textAlign: 'end' }}>
+        <div style={{ textAlign: 'start' }}>
           <CreateLicenseDongle />
           <UpdateLicenseDongle />
         </div>

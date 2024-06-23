@@ -13,6 +13,7 @@ import Sidebar from './pages/global/Sidebar';
 import StockTable from './pages/stockControl/stockTable';
 import StockHistory from './pages/stockControl/stockHistory';
 import StockSettings from './pages/stockControl/stockSettings';
+import StockRequests from './pages/stockControl/stockRequests';
 import MachineLicenseDongles from './pages/stockControl/stockDongles';
 
 export const IP_ADDRESS = 'localhost';
@@ -33,6 +34,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               {/* Stock Control Pages*/}
               {<Route path="/stock/table" element={<StockTable />} />}
+              {<Route path="/stock/requests" element={<StockRequests />} />}
               {<Route path="/stock/history" element={<StockHistory />} />}
               {<Route path="/stock/settings" element={<StockSettings />} />}
               {<Route path="/stock/dongles" element={<MachineLicenseDongles />} />}

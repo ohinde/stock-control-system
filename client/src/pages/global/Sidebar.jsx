@@ -12,6 +12,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
 
 const Sidebar = () => {
   const theme = useTheme();
@@ -111,6 +112,13 @@ const Sidebar = () => {
               title="Stock Dongles"
               to="/stock/dongles"
               icon={<KeyIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Stock Requests"
+              to="/stock/requests"
+              icon={<PublishedWithChangesIcon />}
               selected={selected}
               setSelected={setSelected}
             />

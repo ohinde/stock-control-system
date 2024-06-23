@@ -125,6 +125,21 @@ const SearchStock = () => {
   };
   const handleRemoveStockModalClose = () => setRemoveStockModalOpen(false);
 
+  // Edit Part Description Modal Handling
+  const [partDescriptionModalOpen, setPartDescriptionModalOpen] = React.useState(false);
+  const handlePartDescriptionModalOpen = () => setPartDescriptionModalOpen(true);
+  const handlePartDescriptionModalClose = () => setPartDescriptionModalOpen(false);
+
+  // Edit Part Category Modal Handling
+  const [partCategoryModalOpen, setCategoryModalOpen] = React.useState(false);
+  const handlePartCategoryModalOpen = () => setCategoryModalOpen(true);
+  const handlePartCategoryModalClose = () => setCategoryModalOpen(false);
+
+  // Edit Part Location Modal Handling
+  const [partLocationModalOpen, setPartLocationModalOpen] = React.useState(false);
+  const handlePartLocationModalOpen = () => setPartLocationModalOpen(true);
+  const handlePartLocationModalClose = () => setPartLocationModalOpen(false);
+
   // Edit Additional Notes Modal Handling
   const [additionalNotesModalOpen, setAdditionalNotesModalOpen] = React.useState(false);
   const handleAdditionalNotesModalOpen = () => setAdditionalNotesModalOpen(true);
@@ -137,6 +152,7 @@ const SearchStock = () => {
 
   // Defines Search Form Content
   const [searchFormContent, setSearchFormContent] = useState({
+    partDescription: '',
     partNumber: '',
   });
 
@@ -159,6 +175,27 @@ const SearchStock = () => {
     additionalNotes: '',
   });
 
+  // Load All Available Part Descriptions From The Database
+  const [partDescriptions, setPartDescriptions] = useState([]);
+
+  useEffect(() => {
+    const fetechAllRowData = async () => {
+      try {
+        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/partdescriptions');
+        setPartDescriptions(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetechAllRowData();
+  }, []);
+
+  // Format The Available Part Descriptions From The Database
+  let truncatedPartDescriptions = Object.entries(partDescriptions).map(([id, { partDescription }]) => ({
+    label: partDescription,
+    id: parseInt(id),
+  }));
+
   // Load All Available Part Numbers From The Database
   const [partNumbers, setPartNumbers] = useState([]);
 
@@ -180,23 +217,78 @@ const SearchStock = () => {
     id: parseInt(id),
   }));
 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetechAllRowData = async () => {
+      try {
+        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/categories');
+        setCategories(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetechAllRowData();
+  }, []);
+
+  let truncatedCategories = Object.entries(categories).map(([id, { categoryName }]) => ({
+    label: categoryName,
+    id: parseInt(id),
+  }));
+
+  const [locations, setLocations] = useState([]);
+
+  useEffect(() => {
+    const fetechAllRowData = async () => {
+      try {
+        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/locations');
+        setLocations(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetechAllRowData();
+  }, []);
+
+  let truncatedLocations = Object.entries(locations).map(([id, { locationName }]) => ({
+    label: locationName,
+    id: parseInt(id),
+  }));
+
   // Handle The Search Function And Load Part Information
   const [partData, setPartData] = useState([]);
 
   const handleSearch = async (e) => {
     try {
-      const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/search', {
-        params: searchFormContent,
-      });
+      if (searchFormContent.partDescription !== '') {
+        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/search/description', {
+          params: searchFormContent,
+        });
 
-      if (res.data.length > 0) {
-        setPartData(res.data);
-        handlePartHistorySearch();
+        if (res.data.length > 0) {
+          setPartData(res.data);
+          handlePartHistorySearch();
+        } else {
+          handleModalClose();
+          handlePartNotFoundModalOpen();
+          console.log('No results found.');
+        }
       } else {
-        handleModalClose();
-        handlePartNotFoundModalOpen();
-        console.log('No results found.');
+        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/search/partnumber', {
+          params: searchFormContent,
+        });
+
+        if (res.data.length > 0) {
+          setPartData(res.data);
+          handlePartHistorySearch();
+        } else {
+          handleModalClose();
+          handlePartNotFoundModalOpen();
+          console.log('No results found.');
+        }
       }
+
+      console.log(searchFormContent);
     } catch (err) {
       console.log(err);
     }
@@ -253,13 +345,36 @@ const SearchStock = () => {
     return partData.map((item) => (
       <div key={item.id}>
         <div style={{ display: 'inline-block', width: '40%' }}>
-          <h2>Part Description: {item.partDescription}</h2>
-          <p>Part Number: {item.partNumber}</p>
-          <p>Category: {item.partCategory}</p>
-          <p>Quantity: {item.quantity}</p>
-          <p>Location: {item.location}</p>
-          <p>Last Updated: {item.lastUpdated}</p>
-          <p>Updated By: {item.updatedBy}</p>
+          <h2 style={{ display: 'inline-block', marginRight: '2%' }}> Part Description: {item.partDescription}</h2>{' '}
+          <EditIcon
+            onClick={() => {
+              handlePartDescriptionModalOpen();
+            }}
+          />
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>Part Number: {item.partNumber}</p>
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>Category: {item.partCategory}</p>
+          <EditIcon
+            onClick={() => {
+              handlePartCategoryModalOpen();
+            }}
+          />
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>Quantity: {item.quantity}</p>
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>Location: {item.location}</p>
+          <EditIcon
+            onClick={() => {
+              handlePartLocationModalOpen();
+            }}
+          />
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>
+            Last Updated: {item.lastUpdated}
+          </p>
+          <br />
+          <p style={{ display: 'inline-block', marginTop: '1%', marginRight: '2%' }}>Updated By: {item.updatedBy}</p>
         </div>
         <div style={{ display: 'inline-block', verticalAlign: 'top', textAlign: 'right', width: '60%' }} iv>
           <EditIcon
@@ -314,6 +429,63 @@ const SearchStock = () => {
     handleSearch();
   };
 
+  // Update Part Description
+  const updatePartDescription = async () => {
+    const dataToUpdate = partData.map((item) => ({
+      partNumber: item.partNumber,
+      partDescription: stockChangeFormContent.partDescription,
+    }));
+
+    handlePartDescriptionModalClose();
+
+    try {
+      const res = await axios.post('http://' + IP_ADDRESS + ':8080/stock/update/description', dataToUpdate);
+      updatedSuccesfully();
+    } catch (err) {
+      console.log(err);
+    }
+
+    handleResultsModalClose();
+  };
+
+  // Update Part Category
+  const updatePartCategory = async () => {
+    const dataToUpdate = partData.map((item) => ({
+      partNumber: item.partNumber,
+      partCategory: stockChangeFormContent.partCategory,
+    }));
+
+    handlePartCategoryModalClose();
+
+    try {
+      const res = await axios.post('http://' + IP_ADDRESS + ':8080/stock/update/category', dataToUpdate);
+      updatedSuccesfully();
+    } catch (err) {
+      console.log(err);
+    }
+
+    handleSearch();
+  };
+
+  // Update Part Location
+  const updatePartLocation = async () => {
+    const dataToUpdate = partData.map((item) => ({
+      partNumber: item.partNumber,
+      location: stockChangeFormContent.location,
+    }));
+
+    handlePartLocationModalClose();
+
+    try {
+      const res = await axios.post('http://' + IP_ADDRESS + ':8080/stock/update/location', dataToUpdate);
+      updatedSuccesfully();
+    } catch (err) {
+      console.log(err);
+    }
+
+    handleSearch();
+  };
+
   // Update Additional Notes
   const updateAdditionalNotes = async () => {
     const dataToUpdate = partData.map((item) => ({
@@ -346,28 +518,39 @@ const SearchStock = () => {
         Search Stock
       </StyledButton>
 
-      {/* Add Stock Modal Container */}
+      {/* Search Stock Modal Container */}
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        {/* Add Stock Modal Form */}
+        {/* Search Stock Modal Form */}
         <Box sx={style}>
           <div className="form">
             <h1>Search for a stock item</h1>
-            <h4>Please enter or scan the part number:</h4>
+            <h4>Please search for a part using the description or scan the part number:</h4>
 
             <Autocomplete
               disablePortal
               freeSolo
-              name="partNumber"
-              options={truncatedPartNumbers}
-              onChange={(event, newValue) => handleSearchFormChange('partNumber', newValue ? newValue.label : '')}
+              name="partDescription"
+              options={truncatedPartDescriptions}
+              onChange={(event, newValue) => handleSearchFormChange('partDescription', newValue ? newValue.label : '')}
               getOptionLabel={(option) => option.label}
-              value={truncatedPartNumbers.find((option) => option.label === searchFormContent.partNumber) || null}
-              renderInput={(params) => <TextField {...params} label="Part Number" />}
+              value={
+                truncatedPartDescriptions.find((option) => option.label === searchFormContent.partDescription) || null
+              }
+              renderInput={(params) => <TextField {...params} label="Part Description" />}
+            />
+            <br />
+
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Part Number"
+              onChange={(e) => handleSearchFormChange('partNumber', e.target.value)}
+              name="partNumber"
             />
             <br />
 
@@ -427,10 +610,6 @@ const SearchStock = () => {
                   onClick={handleAddStockModalOpen}
                 >
                   Add To Stock
-                </StyledButton>
-
-                <StyledButton variant="contained" style={{ backgroundColor: colors.primary[500], marginTop: '20px' }}>
-                  Edit Stock Item
                 </StyledButton>
 
                 <StyledButton
@@ -542,6 +721,101 @@ const SearchStock = () => {
             <br />
 
             <ModalButton variant="contained" onClick={submitStockChangesToHistory}>
+              Submit
+            </ModalButton>
+          </div>
+        </Box>
+      </Modal>
+
+      {/* Edit Part Description Modal Container */}
+      <Modal
+        open={partDescriptionModalOpen}
+        onClose={handlePartDescriptionModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={widerStyle}>
+          <div className="form">
+            <h1>Edit Part Description</h1>
+
+            <h4>Please enter the new part description you would like to add below:</h4>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Part Description"
+              onChange={(e) => handleStockChangeFormChange('partDescription', e.target.value)}
+              name="partDescription"
+            />
+            <br />
+            <br />
+
+            <ModalButton variant="contained" onClick={updatePartDescription}>
+              Submit
+            </ModalButton>
+          </div>
+        </Box>
+      </Modal>
+
+      {/* Edit Part Category Modal Container */}
+      <Modal
+        open={partCategoryModalOpen}
+        onClose={handlePartCategoryModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={widerStyle}>
+          <div className="form">
+            <h1>Edit Part Category</h1>
+
+            <h4>Please select the new part category you would like to add below:</h4>
+
+            <Autocomplete
+              disablePortal
+              name="partCategory"
+              options={truncatedCategories}
+              onChange={(event, newValue) =>
+                handleStockChangeFormChange('partCategory', newValue ? newValue.label : '')
+              }
+              getOptionLabel={(option) => option.label}
+              value={truncatedCategories.find((option) => option.label === stockChangeFormContent.partCategory) || null}
+              renderInput={(params) => <TextField {...params} label="Category" />}
+            />
+            <br />
+            <br />
+
+            <ModalButton variant="contained" onClick={updatePartCategory}>
+              Submit
+            </ModalButton>
+          </div>
+        </Box>
+      </Modal>
+
+      {/* Edit Part Description Modal Container */}
+      <Modal
+        open={partLocationModalOpen}
+        onClose={handlePartLocationModalClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={widerStyle}>
+          <div className="form">
+            <h1>Edit Part Location</h1>
+
+            <h4>Please select the new part location you would like to add below:</h4>
+
+            <Autocomplete
+              disablePortal
+              name="location"
+              options={truncatedLocations}
+              onChange={(event, newValue) => handleStockChangeFormChange('location', newValue ? newValue.label : '')}
+              getOptionLabel={(option) => option.label}
+              value={truncatedLocations.find((option) => option.label === stockChangeFormContent.location) || null}
+              renderInput={(params) => <TextField {...params} label="Location" />}
+            />
+            <br />
+            <br />
+
+            <ModalButton variant="contained" onClick={updatePartLocation}>
               Submit
             </ModalButton>
           </div>
