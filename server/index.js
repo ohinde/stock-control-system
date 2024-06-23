@@ -25,6 +25,15 @@ app.get('/stock', (req, res) => {
   });
 });
 
+// Stock Table get request for loading the list of all part descriptions
+app.get('/stock/partdescriptions', (req, res) => {
+  const q = 'SELECT partDescription FROM stock_control_system.stock_table;';
+  db.query(q, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
+});
+
 // Stock Table get request for loading the list of all part numbers
 app.get('/stock/partnumbers', (req, res) => {
   const q = 'SELECT partNumber FROM stock_control_system.stock_table;';
@@ -34,8 +43,20 @@ app.get('/stock/partnumbers', (req, res) => {
   });
 });
 
-// Part Search get request for loading individual part information
-app.get('/stock/search', (req, res) => {
+// Part Search get request for loading individual part information based on a part description
+app.get('/stock/search/description', (req, res) => {
+  const q = 'SELECT * FROM stock_control_system.stock_table WHERE partDescription = ?;';
+
+  const values = [req.query.partDescription];
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
+});
+
+// Part Search get request for loading individual part information based on a part number
+app.get('/stock/search/partnumber', (req, res) => {
   const q = 'SELECT * FROM stock_control_system.stock_table WHERE partNumber = ?;';
 
   const values = [req.query.partNumber];
@@ -75,6 +96,28 @@ app.post('/stock/create', (req, res) => {
   });
 });
 
+// -------------------- Updating Stock Items -------------------- \\
+
+// Post request for updating the part category
+app.post('/stock/update/description', (req, res) => {
+  const date = new Date();
+
+  let currentDay = String(date.getDate()).padStart(2, '0');
+  let currentMonth = String(date.getMonth() + 1).padStart(2, '0');
+  let currentYear = date.getFullYear();
+
+  let currentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+
+  const q =
+    'UPDATE stock_control_system.stock_table SET `partDescription` = ?, `lastUpdated` = ?, `updatedBy` = ? WHERE `partNumber` = ?;';
+  const values = [req.body[0].partDescription, currentDate, req.body[0].updatedBy, req.body[0].partNumber];
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('Stock Item Description Updated Successfully');
+  });
+});
+
 // Post request for updating stock levels
 app.post('/stock/update/quantity', (req, res) => {
   const date = new Date();
@@ -92,6 +135,26 @@ app.post('/stock/update/quantity', (req, res) => {
   db.query(q, values, (err, data) => {
     if (err) return res.json(err);
     return res.json('Stock Item Added Successfully');
+  });
+});
+
+// Post request for updating the part category
+app.post('/stock/update/category', (req, res) => {
+  const date = new Date();
+
+  let currentDay = String(date.getDate()).padStart(2, '0');
+  let currentMonth = String(date.getMonth() + 1).padStart(2, '0');
+  let currentYear = date.getFullYear();
+
+  let currentDate = `${currentYear}-${currentMonth}-${currentDay}`;
+
+  const q =
+    'UPDATE stock_control_system.stock_table SET `partCategory` = ?, `lastUpdated` = ?, `updatedBy` = ? WHERE `partNumber` = ?;';
+  const values = [req.body[0].partCategory, currentDate, req.body[0].updatedBy, req.body[0].partNumber];
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('Stock Item Category Updated Successfully');
   });
 });
 
