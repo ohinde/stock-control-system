@@ -10,6 +10,7 @@ import CreateStockCategory from './modals/createStockCategory';
 import CreateStockLocation from './modals/createStockLocation';
 import RemoveStockCategory from './modals/removeStockCategory';
 import RemoveStockLocation from './modals/removeStockLocation';
+import AssignStockLocations from './modals/assignStockLocations';
 
 import { IP_ADDRESS } from '../../../App';
 
@@ -19,7 +20,7 @@ const StockSettings = () => {
 
   const categoryTableColumns = [
     { field: 'categoryName', headerName: 'Category Name', flex: 1 },
-    { field: 'stockLoactions', headerName: 'Stock Locations', flex: 1.5 },
+    { field: 'stockLocations', headerName: 'Stock Locations', flex: 1.5 },
   ];
 
   const locationTableColumns = [
@@ -101,6 +102,7 @@ const StockSettings = () => {
           <DataGrid rows={categoryData} columns={categoryTableColumns} />
           <CreateStockCategory />
           <RemoveStockCategory />
+          <AssignStockLocations />
         </div>
 
         <div style={{ width: '49%', height: '91%', float: 'right' }}>

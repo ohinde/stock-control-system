@@ -1,6 +1,6 @@
 // Node Module Imports
 import { useContext } from 'react';
-import { ColorModeContext, tokens } from '../../theme';
+import { ColorModeContext, tokens } from '../theme';
 import { Box, IconButton, useTheme } from '@mui/material';
 import InputBase from '@mui/material/InputBase';
 

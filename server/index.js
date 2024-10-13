@@ -214,6 +214,18 @@ app.post('/stock/categories/add', (req, res) => {
   });
 });
 
+// Stock Table post request for adding new stock locations to categories
+app.post('/stock/categories/locations', (req, res) => {
+  const q = 'SELECT `stockLocations` FROM stock_control_system.stock_categories WHERE `categoryName` = ?;';
+
+  const values = [req.body.partCategory];
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
+});
+
 // Stock post request for remove a part category
 app.post('/stock/categories/remove', (req, res) => {
   const q = 'DELETE FROM stock_control_system.stock_categories WHERE categoryName = ?;';
@@ -247,6 +259,26 @@ app.post('/stock/locations/add', (req, res) => {
   db.query(q, [values], (err, data) => {
     if (err) return res.json(err);
     return res.json('Location Created Successfully');
+  });
+});
+
+// Stock Table post request for adding new stock locations to categories
+app.post('/stock/locations/assign', (req, res) => {
+  const q = 'UPDATE stock_control_system.stock_categories SET `stockLocations` = ? WHERE `categoryName` = ?;';
+
+  let categoryName = req.body.categoryName;
+
+  var combinedLocations = req.body.stockLocations.map((l) => l['label']);
+
+  let stockLocations = combinedLocations.toString();
+
+  const values = [stockLocations, categoryName];
+
+  console.log(values);
+
+  db.query(q, values, (err, data) => {
+    if (err) return res.json(err);
+    return res.json('Locations Assigned Successfully');
   });
 });
 

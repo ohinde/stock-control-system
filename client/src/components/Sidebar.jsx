@@ -1,7 +1,7 @@
 // Node Module Imports
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { tokens } from '../../theme';
+import { tokens } from '../theme';
 import { Box, Typography, useTheme } from '@mui/material';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';

@@ -84,6 +84,7 @@ const CreateStockItem = () => {
     updatedBy: '',
   });
 
+  const [locations, setLocations] = useState([]);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -103,28 +104,31 @@ const CreateStockItem = () => {
     id: parseInt(id),
   }));
 
-  const [locations, setLocations] = useState([]);
+  const handleFormChange = (name, value) => {
+    setFormContent((prev) => ({ ...prev, [name]: value }));
 
-  useEffect(() => {
-    const fetechAllRowData = async () => {
-      try {
-        const res = await axios.get('http://' + IP_ADDRESS + ':8080/stock/locations');
-        setLocations(res.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetechAllRowData();
-  }, []);
+    if (name == 'partCategory') {
+      refreshLocations();
+    }
+  };
+
+  const refreshLocations = async (e) => {
+    try {
+      const res = await axios.post('http://' + IP_ADDRESS + ':8080/stock/categories/locations', formContent);
+      console.log(res.data[0].stockLocations);
+
+      const stockLocations = res.data[0].stockLocations;
+      const assignedLocations = stockLocations.split(',');
+      setLocations(assignedLocations);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   let truncatedLocations = Object.entries(locations).map(([id, { locationName }]) => ({
     label: locationName,
     id: parseInt(id),
   }));
-
-  const handleFormChange = (name, value) => {
-    setFormContent((prev) => ({ ...prev, [name]: value }));
-  };
 
   const createNewStockItem = async (e) => {
     e.preventDefault();

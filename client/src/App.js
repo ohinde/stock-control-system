@@ -6,8 +6,8 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 
 // Dashboard Page and Global Components
 import Dashboard from './pages/dashboard';
-import Topbar from './pages/global/Topbar';
-import Sidebar from './pages/global/Sidebar';
+import Topbar from './components/Topbar';
+import Sidebar from './components/Sidebar';
 
 // Stock Control Pages
 import StockTable from './pages/stockControl/stockTable';
